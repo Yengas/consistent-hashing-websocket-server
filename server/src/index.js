@@ -27,10 +27,12 @@ async function main(){
 		base,
 	});
 
-	const events = ['up', 'peerUp', 'peerDown', 'move', 'steal', 'error'];
+	const events = ['up', 'peerUp', 'peerDown', 'move', 'steal'];
 	events.forEach(event => {
 		ring.on(event, () => console.log(event, 'happened'));
 	});
+
+	ring.on('error', (err) => console.log('error', err));
 
 	console.log(`started ${serverIp}:${config.hashring.port} with base of \`${base.join(',')}\``);
 }
