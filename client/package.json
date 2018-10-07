@@ -1,0 +1,14 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "description": "A socket client that just listens on some events",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yengas",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io-client": "^2.1.1"
+  }
+}
