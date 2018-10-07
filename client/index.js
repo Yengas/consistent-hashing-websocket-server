@@ -18,6 +18,7 @@ function connect() {
 
 	io.on('disconnect', function(){
 		console.log('got disconnected, will try re-connecting');
+		io.close();
 		return setTimeout(() => connect(), 5000);
 	});
 }
