@@ -1,10 +1,16 @@
 version: '3.0'
 networks:
-  server-network: {}
+  hashring-network: {}
 volumes: {}
 services:
   server:
     build: ./server
+    environment:
+      - HASHRING_PORT=7373
+      - DOCKER_IMAGE_NAME=consistent-hashing-websocket-server_server
+      - DOCKER_HASHRING_NETWORK_NAME=consistent-hashing-websocket-server_hashring-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - server-network
+      - hashring-network
 

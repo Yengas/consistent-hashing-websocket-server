@@ -1,32 +1,38 @@
 const hashring = require('swim-hashring');
-const ipv4 = require('network-address').ipv4;
-const port = parseInt(process.argv[2]);
-const serverIp = process.argv[3];
-const ring = hashring(Object.assign({ port }, serverIp ? { base: [ serverIp ] } : {}));
+const config = require('./config');
+const resolvers = require('./resolvers');
+const serverIp = require('network-address').ipv4();
 
-const localIp = ipv4();
-console.log('my local ip is', localIp);
-
-const events = ['up', 'peerUp', 'peerDown', 'move', 'steal', 'error'];
-events.forEach(event => {
-	ring.on(event, (data) => console.log(event, 'happened with data', JSON.stringify(data)));
-});
-
-const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-function randomId(){
-	return [...new Array(6)].map(_ => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
+async function resolveWithLocal(){
+	const resolver = resolvers.local({ argv: process.argv });
+	return resolver.resolve();
 }
 
-setInterval(function(){
-	console.log('interval called');
-	const key = randomId();
-	console.log('key', key);
-	const peersResult = ring.peers();
-	const lookupResult = ring.lookup(key);
-	const isAllocatedToMe = ring.allocatedToMe(key);
+async function resolveWithDocker(){
+	const resolver = resolvers.docker({
+		port: config.hashring.port,
+		image: config.docker.image,
+		network: config.docker.network,
+		me: serverIp
+	});
 
-	console.log('isAllocatedToMe', isAllocatedToMe);
-	console.log('lookup', JSON.stringify(lookupResult));
-	console.log('peers', JSON.stringify(peersResult));
-	console.log('--------');
-}, 15000);
+	return resolver.resolve();
+}
+
+async function main(){
+	const resolverToUse = process.argv.length > 2 && process.argv[2].trim() === 'local' ? resolveWithLocal : resolveWithDocker;
+	const base = await resolverToUse();
+	const ring = hashring({
+		port: config.hashring.port,
+		base,
+	});
+
+	const events = ['up', 'peerUp', 'peerDown', 'move', 'steal', 'error'];
+	events.forEach(event => {
+		ring.on(event, () => console.log(event, 'happened'));
+	});
+
+	console.log(`started ${serverIp}:${config.hashring.port} with base of \`${base.join(',')}\``);
+}
+
+main().catch((err) => console.log('error happened when bootstrapping the server', err));
