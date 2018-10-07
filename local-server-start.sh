@@ -5,6 +5,7 @@ trap "kill 0" EXIT
 # get the local ip that the server will listen on
 LOCAL_IP=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
 START_PORT=7373
+SOCKET_START_PORT=8080
 START=1
 # how many servers to start
 SCALE=${1:-2}
@@ -18,7 +19,7 @@ for i in $(seq 1 $SCALE); do
   fi
 
   # start the server with local base resolver and the first server as base
-  HASHRING_PORT=$(($START_PORT + $i - 1)) node server/bin/index "local" "$BASE"&
+  HASHRING_PORT=$(($START_PORT + $i - 1)) SOCKET_PORT=$(($SOCKET_START_PORT + $i - 1)) node server/bin/index "local" "$BASE"&
 
   # wait 1 second before starting the other server
   sleep 1
