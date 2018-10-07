@@ -1,0 +1,17 @@
+{
+  "name": "consistent-hashing-websocket-server",
+  "version": "1.0.0",
+  "description": "A consistent hashing websocket server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "consistent",
+    "hashing",
+    "socket.io",
+    "server"
+  ],
+  "author": "Yengas",
+  "license": "ISC"
+}
