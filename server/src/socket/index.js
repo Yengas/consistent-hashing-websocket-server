@@ -35,10 +35,10 @@ module.exports = function({ me, port, ring }){
 			const socket = io.sockets.sockets[socketId];
 			if(!ring.allocatedToMe(socket.route)){
 				console.log(`removing socket with id of '${socket.id}' because of ring move`);
-				return socket.disconnect();
+				socket.disconnect();
+				delete io.sockets.sockets[socketId];
+				return socket;
 			}
-
-			console.log(`keeping socket with id of '${socket.id}'`);
 		});
 	}
 
