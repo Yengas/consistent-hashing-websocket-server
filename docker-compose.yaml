@@ -1,0 +1,10 @@
+version: '3.0'
+networks:
+  server-network: {}
+volumes: {}
+services:
+  server:
+    build: ./server
+    networks:
+      - server-network
+
