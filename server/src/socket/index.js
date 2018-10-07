@@ -31,7 +31,8 @@ module.exports = function({ me, port, ring }){
 	function handleSocketMove(){
 		const sockets = Object.keys(io.sockets.sockets);
 
-		sockets.forEach(socket => {
+		sockets.forEach((socketId) => {
+			const socket = io.sockets.sockets[socketId];
 			if(!ring.allocatedToMe(socket.route)){
 				console.log(`removing socket with id of '${socket.id}' because of ring move`);
 				return socket.disconnect();

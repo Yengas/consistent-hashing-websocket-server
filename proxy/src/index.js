@@ -1,7 +1,10 @@
+const dns = require('dns');
 const redbird = require('redbird');
 const hashring = require('swim-hashring');
+const { promisify } = require('util');
 const querystring = require('querystring');
 const config = require('./config');
+const lookup = promisify(dns.lookup);
 
 function getRoute(url){
 	const idx = url.indexOf('?');
@@ -28,8 +31,16 @@ function waitForHashring(ring){
 	});
 }
 
+async function getBaseHost(base_host){
+	const IP_REGEX = /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/;
+	if(base_host === "localhost" || !!base_host.match(IP_REGEX))
+		return base_host;
+	return lookup(config.hashring.base_host, { family: 4 });
+}
+
 async function main(){
-	const ring = hashring({ base: [config.hashring.base], client: true });
+	const { address: baseHost } = await getBaseHost(config.hashring.base_host);
+	const ring = hashring({ base: [`${baseHost}:${config.hashring.base_port}`], client: true });
 	await waitForHashring(ring);
 
 	function resolver(host, url, req){

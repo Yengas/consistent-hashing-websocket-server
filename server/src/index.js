@@ -40,11 +40,12 @@ function handleError(err){
 async function main(){
 	const resolverToUse = process.argv.length > 2 && process.argv[2].trim() === 'local' ? resolveWithLocal : resolveWithDocker;
 	const base = await resolverToUse();
-	const ring = hashring({
+	const ringConfig = {
 		port: config.hashring.port,
 		base,
 		meta: { socketServerPort: config.socket.port },
-	});
+	};
+	const ring = hashring(ringConfig);
 
 	await waitForHashring(ring);
 	console.log(`started ${serverIp}:${config.hashring.port} with base of \`${base.join(',')}\``);

@@ -13,4 +13,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - hashring-network
-
+  proxy:
+    build: ./proxy
+    environment:
+      - HASHRING_BASE_HOST=server
+      - HASHRING_BASE_PORT=7373
+      - PORT=8080
+    networks:
+      - hashring-network
+    ports:
+      - 8080:8080
+    depends_on:
+      - server
