@@ -43,6 +43,7 @@ async function main(){
 	const ring = hashring({
 		port: config.hashring.port,
 		base,
+		meta: { socketServerPort: config.socket.port },
 	});
 
 	await waitForHashring(ring);
